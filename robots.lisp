@@ -1,11 +1,13 @@
 ;;;; Land of Lisp, Chapter 11
 ;;;; ROBOTS
 
+;;; Map dimension: 64 x 16 = 1024
+
 (defun robots ()
     (loop named main
           with directions = '((q . -65) (w . -64) (e . -63)
-                              (a . -1)            (d .   1)
-                              (z .  63) (x .  64) (c . 65))
+                              (a .  -1)           (d .   1)
+                              (z .  63) (x .  64) (c .  65))
           ;; Initialize player's position
           for pos = 544
           ;; Process player input
@@ -31,7 +33,7 @@
                                                                    (abs (- (ash new-mpos -6)
                                                                             (ash pos -6))))
                                                                 new-mpos))
-                                            '<
+                                            #'<
                                             :key #'car))))
           ;; Check if all monsters are dead (stopped at same position)
           when (loop for mpos in monsters
@@ -39,6 +41,7 @@
           return 'player-wins
           ;; Render
           do (format t "~A[H~@*~A[J" #\escape) ; clear screen
+             (format t "+~v@{~A~:*~}+" 64 #\-) ; print horizontal wall
              (format t 
                      "~%|~{~<|~%|~,65:;~A~>~}|"
                      (loop for p 
@@ -49,5 +52,7 @@
                                                     #\A))
                                          ((= p pos) #\@)
                                          (t         #\space))))
+             (fresh-line)
+             (format t "+~v@{~A~:*~}+" 64 #\-) ; print horizontal wall
              (when (member pos monsters)
                 (return-from main 'player-loses))))
